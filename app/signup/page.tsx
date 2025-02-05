@@ -15,8 +15,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { use, useState } from "react"
 import axios from "axios"
+import { useRouter } from "next/navigation"
 
 import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
+
 
 
 const formSchema = z.object({
@@ -33,10 +36,11 @@ const formSchema = z.object({
 })
 
 export default function SignUpPage() {
-    const { toast } = useToast();
+    const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [didCreateAccount, setDidCreateAccount] = useState(false);
     const crypto = require('crypto');
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -59,7 +63,13 @@ export default function SignUpPage() {
 
         
         if (didCreateAccount) {
-            
+            toast({
+                title: "Account Already Created!",
+                description: "You will be redirected shortly."
+            })
+            setTimeout(() => {
+                router.push('/login')
+            }, 3000)
         } else {
             try {
                 const hashedPassword = crypto.createHash('sha256').update(values.password).digest('hex');
@@ -71,7 +81,10 @@ export default function SignUpPage() {
                     console.log('Account created successfully')
                     console.log(res.data)
                     setDidCreateAccount(true);
-                    
+                    setTimeout(() => {
+                        router.push('/login')
+                    }, 3000)
+
                 }).catch((err) => {
                     console.error('Error:', err)
                 });
@@ -135,7 +148,20 @@ export default function SignUpPage() {
                         </Button>
                     </form>
 
-                    <Button onClick={showToast} className="w-full">
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            toast({
+                            title: "Scheduled: Catch up ",
+                            description: "Friday, February 10, 2023 at 5:57 PM",
+                            action: (
+                                <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+                            ),
+                            })
+                        }}
+                        >
+                        Add to calendar
+                    </Button>
                 </Form>
             </div>
         </div>

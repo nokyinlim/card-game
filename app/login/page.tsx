@@ -1,6 +1,5 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react"
 import { redirect, useRouter } from "next/navigation"
 import { useEffect } from "react";
 
@@ -25,38 +24,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-function LoginForm() {
-  return (
-    <Card className="w-[350px]">
-      <CardHeader>
-      </CardHeader>
-      <CardContent>
-        <Button onClick={() => signIn("google", {redirect: true})}>Sign In With Google</Button>
-      </CardContent>
-      <CardFooter>
-        <CardDescription>
-            Other Sign-In Options...
-        </CardDescription>
-      </CardFooter>
-    </Card>
-  )
-}
-
 
 export default function Login() {
     const router = useRouter();
-    const session = useSession();
-    if (session.status === "authenticated") {
-        useEffect(() => {
-            router.push('/')
-        })
-    }
     
     return (
         <div>
-            <LoginForm/>
 
-
+      Logged In!
         </div>
     )
 }
