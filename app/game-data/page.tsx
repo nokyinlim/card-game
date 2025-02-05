@@ -1,6 +1,6 @@
 "use client"
 // import { auth } from "@/auth";
-import { useSession } from "next-auth/react";
+
 import { useState, useEffect, useRef } from "react";
 // import { Clipboard as ClipboardCopy, ClipboardCheck as CompletedClipboardCopy } from "lucide-react";
 import axios from "axios";
@@ -21,7 +21,6 @@ import { Action } from "../utils";
 
 
 export default function NewGame() {
-  const { data: session, status } = useSession();
   const [playerID, setPlayerID] = useState("");
   const [action, setAction] = useState("0");
   const [gameCode, setGameCode] = useState("");

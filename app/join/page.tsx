@@ -1,6 +1,4 @@
 "use client"
-import { auth } from "@/auth";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
@@ -11,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 export default function JoinGame() {
-  const { data: session, status } = useSession();
   const [gameCode, setGameCode] = useState("");
   const [characterID, setCharacterID] = useState("guardian");
   const [playerID, setPlayerID] = useState("Bob");

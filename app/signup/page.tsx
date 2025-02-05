@@ -39,6 +39,7 @@ export default function SignUpPage() {
     const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [didCreateAccount, setDidCreateAccount] = useState(false);
+    const [username, setUsername] = useState("");
     const crypto = require('crypto');
     const router = useRouter();
 
@@ -81,9 +82,11 @@ export default function SignUpPage() {
                     console.log('Account created successfully')
                     console.log(res.data)
                     setDidCreateAccount(true);
-                    setTimeout(() => {
-                        router.push('/login')
-                    }, 3000)
+                    setUsername(values.username);
+                    localStorage.setItem('didCreateAccount', 'true');
+                    localStorage.setItem('username', values.username);
+                    localStorage.setItem('password', hashedPassword);
+                    
 
                 }).catch((err) => {
                     console.error('Error:', err)
@@ -97,73 +100,77 @@ export default function SignUpPage() {
             }
         }
     }
-
-    return (
-        <div className="flex min-h-screen items-center justify-center">
-            <div className="w-full max-w-md space-y-8 p-8 border rounded-lg shadow-lg">
-                <h2 className="text-2xl font-bold text-center">Create Account</h2>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="username"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Username</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter username" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="Enter password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Confirm Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="Confirm password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? "Creating account..." : "Sign Up"}
-                        </Button>
-                    </form>
-
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            toast({
-                            title: "Scheduled: Catch up ",
-                            description: "Friday, February 10, 2023 at 5:57 PM",
-                            action: (
-                                <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-                            ),
-                            })
-                        }}
-                        >
-                        Add to calendar
-                    </Button>
-                </Form>
+    if (!didCreateAccount) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="w-full max-w-md space-y-8 p-8 border rounded-lg shadow-lg">
+                    <h2 className="text-2xl font-bold text-center">Create Account</h2>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="username"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter username" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="Enter password" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Confirm Password</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="Confirm password" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading ? "Creating account..." : "Sign Up"}
+                            </Button>
+                        </form>
+                    </Form>
+                </div>
             </div>
-        </div>
-    )
+        )
+    } else {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="w-full max-w-md space-y-4 p-8 border rounded-lg shadow-lg">
+                    <h2 className="text-2xl font-bold text-center">Welcome, {username}!</h2>
+                    <p>You're one step away from playing!</p>
+                    <p>Hello</p>
+
+                    <br/><a href="/"><Button variant="outline" type="submit" className="w-full" disabled={isLoading}>
+                        Take A Tutorial
+                    </Button></a>
+                    
+                    <a href="/"><Button variant="outline" type="submit" className="w-full" disabled={isLoading}>
+                        Continue and Get Started
+                    </Button></a>
+                </div>
+            </div>
+        )
+    }
 }

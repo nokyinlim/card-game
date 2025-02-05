@@ -1,6 +1,5 @@
 "use client"
 // import { auth } from "@/auth";
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 // import { Clipboard as ClipboardCopy, ClipboardCheck as CompletedClipboardCopy } from "lucide-react";
 import axios from "axios";
@@ -19,7 +18,6 @@ import {
 
 export default function NewGame() {
 
-  const { data: session, status } = useSession();
   const [characterID, setCharacterID] = useState("guardian");
   const [playerID, setPlayerID] = useState("Bob");
   const [generatedGameData, setGeneratedGameData] = useState({});
@@ -27,7 +25,7 @@ export default function NewGame() {
   const [didGenerateGame, setDidGenerateGame] = useState(false);
   const [possibleCharacters, setPossibleCharacters] = useState([]);
   const [didCopyGameCode, setDidCopyGameCode] = useState(false);
-
+  const [username, setUsername] = useState("");
   
 
   useEffect(() => {
@@ -37,6 +35,8 @@ export default function NewGame() {
     }).catch((e) => {
         console.log(`Error: ${e}`);
     });
+
+    setUsername(localStorage.getItem("username") ?? "");
   }, [])
   
 
@@ -131,15 +131,20 @@ export default function NewGame() {
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
   
       
-      <Card className="w-[350px] h-[300px]">
+      <Card className="w-[350px] h-[450px]">
         <CardHeader>
           <CardTitle>Start A New Game</CardTitle>
           <CardDescription>Invite friends using the Game Code generated</CardDescription>
+          <CardDescription>You will be the host of the game. Others will have to use your generated game code to join.</CardDescription>
+          <CardDescription>Having an even number of players is recommended, but not necessary. Minimum of 2 players to start.</CardDescription>
         </CardHeader>
         
         <form onSubmit={createGame}>
         <CardContent>
           <div className="grid w-full items-center gap-4">
+            {username ? <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="name">Hosting Game as {username}</Label>
+            </div> : ''}
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Player ID / Username</Label>
               <Input id="name" placeholder="Bobby" onChange={(e) => setPlayerID(e.target.value)} />
