@@ -11,3 +11,4 @@ const app = new Elysia({ prefix: '/api' })
 
 export const GET = app.handle 
 export const POST = app.handle 
+export const runtime = 'edge';
