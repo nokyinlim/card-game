@@ -35,6 +35,7 @@ export default function NewGame() {
   const [actionNames, setActionNames] = useState([]);
   const [actionDetails, setActionDetails] = useState<Action[]>([]);
   const [event, setEvent] = useState("");
+  const [target, setTarget] = useState("");
   const wsRef = useRef<WebSocket | null>(null);
 
 
@@ -181,8 +182,8 @@ export default function NewGame() {
           "game_code": "${gameCode}", 
           "player_id": "${playerID}",
           "params": {
-            "target": "${opponent}",
-            "targets": ["${opponent}"]
+            "target": "${target}",
+            "targets": ["${target}"]
           }
         }`);
       }
@@ -225,6 +226,31 @@ export default function NewGame() {
                   })}
                 </SelectContent>
               </Select>
+
+              {actionDetails.map((a: Action, i) => {
+                if (a.name === actionNames[parseInt(action)]) {
+                  
+                  return (
+                    <div>
+                      <Label htmlFor="target">Target</Label>
+                      <Select onValueChange={setTarget}>
+                        <SelectTrigger id="target">
+                          <SelectValue placeholder="No Target Selected" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          {playerIDs.map((p: string) => {
+                            if (p !== playerID) {
+                              return (
+                                <SelectItem value={p} key={p}>{p}</SelectItem>
+                              )
+                            }
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )
+                }
+              })}
             </div>
 
             <div>Your Current Action is: {action ? action : "No Action"}<br/>

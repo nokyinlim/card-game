@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@radix-ui/react-label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import Link from "next/link";
 
 
@@ -22,22 +22,20 @@ export default async function Home() {
         <form>
         <CardContent>
           You can either create an account to save your progress or play as a guest.<br/>
-
+          <br/>
           <Label>How To Play</Label>
-            <Select>
-              <SelectTrigger>Select An Option</SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">How to Play</SelectItem>
-                <SelectItem value="2">Game Rules</SelectItem>
-              </SelectContent>
-            </Select>
+
+          <div className="flex justify-between gap-2">
+            <Link href="/tutorial"><Button variant="outline">Tutorial</Button></Link>
+            <Button>Create Account</Button>
+          </div>
         </CardContent>
 
         
         
-        <CardFooter className="flex justify-between">
-            <Button>Play As Guest</Button>
-            <Button>Create Account and Play</Button>
+        <CardFooter className="flex justify-between gap-2">
+            <Link href="join"><Button variant="outline">Play As Guest</Button></Link>
+            <Button>Create Account</Button>
         </CardFooter>
         </form>
         

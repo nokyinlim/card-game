@@ -79,14 +79,23 @@ export default function SignUpPage() {
                     username: values.username,
                     hashed_password: hashedPassword
                 }).then((res) => {
-                    console.log('Account created successfully')
-                    console.log(res.data)
-                    setDidCreateAccount(true);
-                    setUsername(values.username);
-                    localStorage.setItem('didCreateAccount', 'true');
-                    localStorage.setItem('username', values.username);
-                    localStorage.setItem('password', hashedPassword);
-                    
+
+                    if (res.data.title == "Username Taken") {
+                        console.log('Username already taken')
+                        console.log(res.data)
+                        toast({
+                            title: "Username Taken!",
+                            description: "Please try another username."
+                        })
+                    } else {
+                        console.log('Account created successfully')
+                        console.log(res.data)
+                        setDidCreateAccount(true);
+                        setUsername(values.username);
+                        localStorage.setItem('didCreateAccount', 'true');
+                        localStorage.setItem('username', values.username);
+                        localStorage.setItem('password', hashedPassword);
+                    }
 
                 }).catch((err) => {
                     console.error('Error:', err)
