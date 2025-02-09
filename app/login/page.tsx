@@ -49,9 +49,7 @@ export default function Login() {
         },
     })
 
-    useEffect(() => {
-      
-    }, [])
+    const source = localStorage.getItem("source") || "localhost:8000";
 
     const showToast = () => {
         toast({
@@ -66,7 +64,7 @@ export default function Login() {
         try {
             const hashedPassword = crypto.createHash('sha256').update(values.password).digest('hex');
             
-            await axios.post('http://localhost:8000/get-account', {
+            await axios.post(`http://${source}/get-account`, {
                 username: values.username,
                 hashed_password: hashedPassword
             }).then((res) => {

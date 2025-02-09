@@ -16,6 +16,7 @@ import {
     SelectValue,
   } from "@/components/ui/select"
 import { Action } from "../utils";
+import { useRouter } from "next/navigation";
 
 
 
@@ -24,9 +25,9 @@ export default function NewGame() {
   const [playerID, setPlayerID] = useState("");
   const [action, setAction] = useState("0");
   const [gameCode, setGameCode] = useState("");
-  
-  const [actionParams, setActionParams] = useState({});
-  const [possibleCharacters, setPossibleCharacters] = useState([]);
+  const router = useRouter();
+  // const [actionParams, setActionParams] = useState({});
+  // const [possibleCharacters, setPossibleCharacters] = useState([]);
   const [turnCount, setTurnCount] = useState(0);
   const [playerIDs, setPlayerIDs] = useState([]);
   const [opponent, setOpponent] = useState("");
@@ -37,12 +38,15 @@ export default function NewGame() {
   const [event, setEvent] = useState("");
   const [target, setTarget] = useState("");
   const wsRef = useRef<WebSocket | null>(null);
+  const source = localStorage.getItem("source") || "localhost:8000";
 
 
   const updateGame = () => {
     setGameCode(localStorage.getItem("game_code") || "");
     setPlayerID(localStorage.getItem("player_id") || "p2");
-    axios.post(`http://localhost:8000/game-data`, {
+
+
+    axios.post(`http://${source}/game-data`, {
         game_code: localStorage.getItem('game_code') || ""
     }).then((res) => {
         console.log(res.data)
@@ -72,12 +76,14 @@ export default function NewGame() {
 
   useEffect(() => {
     // Initialize WebSocket connection
-    const ws = new WebSocket("ws://localhost:8000/game-ws");
+    const ws = new WebSocket(`ws://${source}/game-ws`);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
       setEvent(event.data);
+      console.log("WebSocket message:", event.data);
       updateGame();
+      getOptions();
     };
 
     ws.onopen = () => {
@@ -98,27 +104,28 @@ export default function NewGame() {
   }, []);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/get-all-characters').then((res) => {
-        console.log(res.data)
-        setPossibleCharacters(res.data)
-        setGameCode(localStorage.getItem("game_code") || "");
-        setPlayerID(localStorage.getItem("player_id") || "p2");
-    }).catch((e) => {
-        console.log(`Error: ${e}`);
-    });
-    
 
-  }, [])
+      setGameCode(localStorage.getItem("game_code") || "");
+      
+      if (localStorage.getItem("game_code") === "") {
+        console.log("Could not find a Game Code. Redirecting to Home Page.");
+        router.push("/");
+      }
+      setPlayerID(localStorage.getItem("player_id") || "p2");
+      if (localStorage.getItem("player_id") === "") {
+        console.log("Could not find a Player ID. Redirecting to Home Page.");
+        router.push("/");
+      }
+
+      updateGame();
+      getOptions();
+    }, []);
   var index = 0;
-  
-  useEffect(() => {
-    updateGame();
-  }, [])
 
   const testAction = async (e: any) => {
     e.preventDefault();
 
-    const response = await axios.post('http://localhost:8000/action', {
+    const response = await axios.post(`http://${source}/action`, {
         action: "attack",
         player_id: localStorage.getItem('player_id'),
         game_code: gameCode,
@@ -132,15 +139,18 @@ export default function NewGame() {
     
   }
 
-  const getOptions = async (e: any) => {
-    e.preventDefault();
+  const getOptions = async () => {
 
-    await axios.post('http://localhost:8000/turn-options', {
+    await axios.post(`http://${source}/turn-options`, {
         player_id: localStorage.getItem('player_id'),
         game_code: gameCode,
       }).then((res) => {
         console.log(res.data)
         
+        if (!res.data) {
+          console.log("No options found")
+          return;
+        }
         
         // actions = res.data
 
@@ -177,8 +187,10 @@ export default function NewGame() {
     try {
       const selectedAction = actionDetails[parseInt(action)];
       if (selectedAction) {
+        console.log("Send data to WebSocket");
         wsRef.current.send(`{
-          "action": "${selectedAction.name}", 
+          "type": "${selectedAction.type}",
+          "name": "${selectedAction.name}", 
           "game_code": "${gameCode}", 
           "player_id": "${playerID}",
           "params": {
@@ -229,7 +241,8 @@ export default function NewGame() {
 
               {actionDetails.map((a: Action, i) => {
                 if (a.name === actionNames[parseInt(action)]) {
-                  
+                  console.log(a);
+                  if (a.params.includes("Target")) {
                   return (
                     <div>
                       <Label htmlFor="target">Target</Label>
@@ -249,6 +262,7 @@ export default function NewGame() {
                       </Select>
                     </div>
                   )
+                  }
                 }
               })}
             </div>

@@ -27,9 +27,10 @@ export default function NewGame() {
   const [didCopyGameCode, setDidCopyGameCode] = useState(false);
   const [username, setUsername] = useState("");
   
+  const source = localStorage.getItem("source") || "localhost:8000";
 
   useEffect(() => {
-    axios.get('http://localhost:8000/get-all-characters').then((res) => {
+    axios.get(`http://${source}/get-all-characters`).then((res) => {
         console.log(res.data)
         setPossibleCharacters(res.data)
     }).catch((e) => {
@@ -44,7 +45,7 @@ export default function NewGame() {
     e.preventDefault(); // Prevent form submission default behavior
     
     try {
-      const response = await axios.post('http://localhost:8000/get-character/', {
+      const response = await axios.post(`http://${source}/get-character/`, {
         characterID: characterID
       });
       console.log(response.data);
@@ -57,7 +58,7 @@ export default function NewGame() {
     e.preventDefault(); // Prevent form submission default behavior
     
     try {
-      const response = await axios.post('http://localhost:8000/generate-code', {
+      const response = await axios.post(`http://${source}/generate-code`, {
         character_id: characterID,
         player_id: playerID,
       });

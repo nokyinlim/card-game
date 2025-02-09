@@ -122,7 +122,7 @@ const TutorialSteps: TutorialStep[] = [
                 Base Magic Defense: 15<br/>
                 Attack Damage: 15<br/>
                 Critical Hit Chance: 5%<br/>
-                Attack Accuracy: 40<br/>
+                Attack Accuracy: 30<br/>
                 Hit Evasion: 15<br/>
                 </div>
                 <div>
@@ -145,7 +145,7 @@ const TutorialSteps: TutorialStep[] = [
         <div className="flex flex-col text-left">
         <h3 className="font-semibold text-sm">Mage</h3>
           <p className="text-sm text-muted-foreground">
-            The Mage is a heavily magic-based character specializing in the Magics.
+            The Mage is a heavily magic-based character specializing in the Magics. 
           </p><br/>
           <h3 className="font-semibold text-sm">Unique Spell: Thunderstrike (10)</h3>
           <span className="text-sm text-muted-foreground">A thunderbolt deals major Thunder-type damage to 1 Target. Afterward, decreases defense and cannot cast spells for 1 turn.</span>
@@ -166,7 +166,7 @@ const TutorialSteps: TutorialStep[] = [
     )
   },
   {
-    title: "Character List - Electric-Mage",
+    title: "Character List - Requiem of Shadows",
     content: (
         <div className="grid grid-cols-2 gap-8">
         <div className="flex flex-col items-center gap-2">
@@ -188,7 +188,7 @@ const TutorialSteps: TutorialStep[] = [
                 Base SP: 30<br/>
                 Base Defense: 15<br/>
                 Base Magic Defense: 15<br/>
-                Attack Damage: 15<br/>
+                Attack Damage: 30<br/>
                 Critical Hit Chance: 30%<br/>
                 Attack Accuracy: 70<br/>
                 Hit Evasion: 25<br/>
@@ -216,7 +216,7 @@ const TutorialSteps: TutorialStep[] = [
             The Ninja is a stealthy character that can deal high damage and evade attacks.
           </p><br/>
           <h3 className="font-semibold text-sm">Unique Ability: Summon Clone (12)</h3>
-          <span className="text-sm text-muted-foreground">Summons a weaker clone to fight for you until death or for 4 turns, whichever is longer</span>
+          <span className="text-sm text-muted-foreground">Summons a weaker clone to fight for you until death or for 4 turns, whichever is longer. </span>
           <br/><h3 className="font-semibold text-sm">Passive: Way of the Ninja</h3>
           <p className="text-sm text-muted-foreground">
             Increases critical hit chance against enemies with a status effect.
@@ -228,6 +228,142 @@ const TutorialSteps: TutorialStep[] = [
           <h3 className="font-semibold text-sm">Spell: Smoke Bomb (Mana: 5)</h3>
           <p className="text-sm text-muted-foreground">
           Increases all ally Evasion while decreasing Accuracy of all allies, except the Ninja.
+          </p>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "Character List - The Rogue Who Betrayed A Kingdom",
+    content: (
+        <div className="grid grid-cols-2 gap-8">
+        <div className="flex flex-col items-center gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+            <Image src="/character_portraits/Rogue.png" alt="Rogue" width={320} height={320} className="border-4 border-solid rounded-md border-gray-600 bg-gray-100" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>The Rogue Who Betrayed A Kingdom</AlertDialogTitle>
+                <AlertDialogDescription>
+                <div className="grid grid-cols-2 gap-8">
+                <div className="flex flex-col">
+                Class: <b>Ninja</b><br/>
+                Element: <b>Shadow</b><br/>
+                Base Spell Damage: 10<br/>
+                Base Health: 100<br/>
+                Base MP: 16<br/>
+                Base SP: 40<br/>
+                Base Defense: 10<br/>
+                Base Magic Defense: 10<br/>
+                Attack Damage: 40<br/>
+                Critical Hit Chance: 20%<br/>
+                Attack Accuracy: 80<br/>
+                Hit Evasion: 20<br/>
+                </div>
+                <div>
+                <Image src="/character_portraits/Rogue.png" alt="Rogue" width={240} height={240} className="border-4 border-solid rounded-md border-gray-600 bg-gray-100" />
+                </div>
+                </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction>
+                  Close
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+
+          
+        </div>
+        <div className="flex flex-col text-left">
+        <h3 className="font-semibold text-sm">Rogue</h3>
+          <p className="text-sm text-muted-foreground">
+            A variant of the Ninja, Rogues are more skill-focused and focus on the element of Surprise.
+          </p><br/>
+          <h3 className="font-semibold text-sm">Unique Ability: Sneak Attack (10)</h3>
+          <span className="text-sm text-muted-foreground">Deals major physical damage to one enemy. Always crits and deals much more damage to Distracted targets. Can only be activated while hidden.</span>
+          <br/><h3 className="font-semibold text-sm">Passive: Rogue Assassin</h3>
+          <p className="text-sm text-muted-foreground">
+            Increases critical hit chance against enemies with a status effect.
+          </p><br/> 
+          <h3 className="font-semibold text-sm">{"<Rogue-specific> "}Ability: Hiding (4)</h3>
+          <p className="text-sm text-muted-foreground">
+            Hides the Rogue from enemy attacks and increases other Rogue skills.
+          </p><br/>
+          <h3 className="font-semibold text-sm">Spell: Cloak of Shadows (Mana: 8)</h3>
+          <p className="text-sm text-muted-foreground">
+          Marks a target. 
+          </p>
+        </div>
+      </div>
+    )
+  },
+  {
+    title: "Character List - Sorcerer",
+    content: (
+        <div className="grid grid-cols-2 gap-8">
+        <div className="flex flex-col items-center gap-2">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+            <Image src="/character_portraits/Sorcerer.png" alt="Sorcerer" width={320} height={320} className="border-4 border-solid rounded-md border-gray-600 bg-gray-100" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>The Sorcerer Who United The Forest</AlertDialogTitle>
+                <AlertDialogDescription>
+                <div className="grid grid-cols-2 gap-8">
+                <div className="flex flex-col">
+                Class: <b>Mage</b><br/>
+                Element: <b>Earth</b><br/>
+                Base Spell Damage: 30<br/>
+                Base Health: 80<br/>
+                Base MP: 40<br/>
+                Base SP: 10<br/>
+                Base Defense: 10<br/>
+                Base Magic Defense: 15<br/>
+                Attack Damage: 10<br/>
+                Critical Hit Chance: 0%<br/>
+                Attack Accuracy: 40<br/>
+                Hit Evasion: 10<br/>
+                </div>
+                <div>
+                <Image src="/character_portraits/Sorcerer.png" alt="Sorcerer" width={240} height={240} className="border-4 border-solid rounded-md border-gray-600 bg-gray-100" />
+                </div>
+                </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction>
+                  Close
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+
+          
+        </div>
+        <div className="flex flex-col text-left">
+        <h3 className="font-semibold text-sm">Sorcerer</h3>
+          <p className="text-sm text-muted-foreground">
+            An elemental variant of the Mage, Sorcerers are more focused on the elements and their effects. Can use Mage spells and abilities.
+          </p><br/>
+          <h3 className="font-semibold text-sm">Unique Spell: Secret Art of Earth (20)</h3>
+          <span className="text-sm text-muted-foreground">A large boulder rises from the ground, dealing moderate Earth spell damage to All Enemies. Can be used once per battle.</span>
+          <br/><h3 className="font-semibold text-sm">Passive: Power of Earth</h3>
+          <p className="text-sm text-muted-foreground">
+            Massively increases own Earth-type damage against Water-type enemies.
+          </p><br/> 
+          <h3 className="font-semibold text-sm">Ability: Elemental Bind (5)</h3>
+          <p className="text-sm text-muted-foreground">
+            Targets any character and binds them to an element of choice, changing their elemental strengths and weaknesses.
+          </p><br/>
+          <h3 className="font-semibold text-sm">Spell: Antidote (2)</h3>
+          <p className="text-sm text-muted-foreground">
+            Antidotes cure different negative status effects from Characters.
           </p>
         </div>
       </div>

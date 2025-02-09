@@ -43,6 +43,8 @@ export default function SignUpPage() {
     const crypto = require('crypto');
     const router = useRouter();
 
+    const source = localStorage.getItem("source") || "localhost:8000";
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -75,7 +77,7 @@ export default function SignUpPage() {
             try {
                 const hashedPassword = crypto.createHash('sha256').update(values.password).digest('hex');
                 
-                const response = await axios.post('http://localhost:8000/create-account', {
+                const response = await axios.post(`http://${source}/create-account`, {
                     username: values.username,
                     hashed_password: hashedPassword
                 }).then((res) => {
