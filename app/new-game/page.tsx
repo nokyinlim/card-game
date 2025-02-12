@@ -15,6 +15,7 @@ import {
     SelectValue,
   } from "@/components/ui/select"
 // import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function NewGame() {
 
@@ -28,6 +29,8 @@ export default function NewGame() {
   const [username, setUsername] = useState("");
   
   const source = localStorage.getItem("source") || "localhost:8000";
+
+  const router = useRouter();
 
   useEffect(() => {
     axios.get(`http://${source}/get-all-characters`).then((res) => {
@@ -83,21 +86,24 @@ export default function NewGame() {
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
   
       
-      <Card className="w-[350px] h-[330px]">
+      <Card className="w-[350px] h-[350px]">
         <CardHeader>
           <CardTitle>Game Created!</CardTitle>
-          <CardDescription>Invite friends using the game code:</CardDescription>
+          <CardDescription>When enough players have joined the game, you can start the game using the button below.</CardDescription>
           <CardTitle>{generatedGameCode}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
+
+
+
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Player ID / Username</Label>
-              <Input id="name" placeholder="Bobby" onChange={(e) => setPlayerID(e.target.value)} />
+              <Input id="name" placeholder={playerID} onChange={(e) => setPlayerID(e.target.value)} disabled/>
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="framework">Character</Label>
-              <Select onValueChange={setCharacterID}>
+              <Select onValueChange={setCharacterID} value={characterID} disabled>
                 <SelectTrigger id="framework">
                   <SelectValue placeholder="Select Your Character" />
                 </SelectTrigger>
@@ -116,9 +122,12 @@ export default function NewGame() {
         </CardContent>
         <CardFooter className="flex justify-between">
           {/* <Button variant="outline" type="reset" className="transform transition ease-in-out hover:scale-110 active:scale-105">Clear</Button> */}
-          <a href="/game">
-          <Button className="transform transition ease-in-out hover:scale-110 active:scale-105">Start Game</Button>
-          </a>
+          <Button onClick={() => {
+            axios.post(`http://${source}/start-game`, {
+              game_code: generatedGameCode
+            })
+            setTimeout(() => {router.push('/game')}, 1000)
+          }}>Start Game</Button>
         </CardFooter>
         
       </Card>

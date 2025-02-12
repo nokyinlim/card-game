@@ -8,11 +8,16 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger, DialogTitle, DialogContent, DialogDescription, DialogHeader } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { DialogClose } from "@radix-ui/react-dialog";
 export default function Home() {
 
   const { toast } = useToast();
   const router = useRouter();
+
+  const [source, setSource] = useState(localStorage.getItem("source") || "localhost:8000");
 
   const openLink = (url: string) => {
     toast({
@@ -29,7 +34,31 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="fixed bottom-8 right-8 w-[120px] h-[30px]" variant="outline" size="icon">
+              Enter Source
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Enter a Source</DialogTitle>
+              <DialogDescription>
+                This source should be a URL to the backend server. For example, "localhost:8000" if you are running the server locally.
+              <Input placeholder="localhost:8000" onChange={(e) => {setSource(e.target.value)}}></Input>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogClose asChild>
+              <Button onClick={() => {
+                localStorage.setItem("source", source);
+                toast({
+                  title: "Source Set",
+                  description: `Source set to "${source}".`
+                })
+              }}>Set Source</Button>
+            </DialogClose>
+          </DialogContent>
+        </Dialog>
 
       <Card className="w-[400px] h-[600px]">
         <CardHeader>
@@ -83,6 +112,8 @@ export default function Home() {
         
         
         </Card>
+        
+        
     </main>
   );
 }

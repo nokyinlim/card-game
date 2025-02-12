@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
+import { useToast } from "@/hooks/use-toast";
+
 export default function JoinGame() {
   const [gameCode, setGameCode] = useState("");
   const [characterID, setCharacterID] = useState("guardian");
@@ -15,6 +17,8 @@ export default function JoinGame() {
   const [didJoinGame, setDidJoinGame] = useState(false);
 
   const [possibleCharacters, setPossibleCharacters] = useState([]);
+
+  const { toast } = useToast();
 
   const source = localStorage.getItem("source") || "localhost:8000";
 
@@ -25,6 +29,12 @@ export default function JoinGame() {
     }).catch((e) => {
         console.log(`Error while fetching characters: ${e}`);
     });
+
+    toast({
+      title: "You don't have a Game Key",
+      description: "Enter a Game Key to join others",
+      
+    })
   }, [])
 
   const getCharacter = async (e: { preventDefault: () => void; }) => {
