@@ -29,10 +29,21 @@ export type StatModifier = {
     displayName: string;
 }
 
+export type DamageValue = {
+    damage: number;
+    element: string;
+    targets: string;
+}
+
 export type Castable = {
     name: string;
     lore: string;
-    
+    info: string;
+    cost: number;
+    effect: StatModifier[];
+    type: string;
+    damage: DamageValue;
+    cooldown: number;
 }
 
 export type BaseStats = {
@@ -58,7 +69,16 @@ export type Character = {
     element: string;
     base_stats: BaseStats;
     character_data: object;
-
+    stat_modifiers: StatModifier[];
+    active_modifiers: StatModifier[];
+    activeEffects: StatModifier[];
+    effects: object[];
+    abilities: Castable[];
+    spells: Castable[];
+    passives: string;
+    equipment: object[];
+    inventory: object[];
+    description: string;
 }
 
 export const character_portraits = {

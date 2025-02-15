@@ -1,6 +1,11 @@
 "use client"
+
+// This page creates many errors if opened with VSCode for iPad. They can be safely ignored
+
 import { useEffect, useRef, useState } from "react";
 import { Action } from "../utils";
+
+
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
@@ -83,6 +88,9 @@ export default function Game() {
       const parsed_data = JSON.parse(event.data);
 
       const this_game_code = gameCode;
+
+      console.log("A message from the WebSocket has been received.")
+      console.log(`The WebSocket has returned the following data: \ngame_code: ${parsed_data.game_code}\nplayers: ${parsed_data.players}\nerror: ${parsed_data.error}`)
 
       if (parsed_data.game_code != this_game_code && false) {
         console.log(`This WebSocket is not for this current game. WS Returned Code: ${parsed_data.game_code}; Current Code: ${this_game_code}`);
@@ -227,9 +235,9 @@ export default function Game() {
     // This function sends a POST request to the server to get the game data.
     axios.post(`http://${source}/game-data`, {
         game_code: gameCode
-    }).then((res) => {
+    }).then((res: any) => {
         // Debug Purposes Only
-        console.log(gameCode);
+        console.log(`Game Code is: ${gameCode}`);
         // This sets the turn count to the current turn count from the server.
         setTurnCount(res.data.current_turn[0]);
 
@@ -257,7 +265,7 @@ export default function Game() {
         
         
         setOpponent(opponents);
-    }).catch((e) => {
+    }).catch((e: any) => {
         // This means that the Game Code entered is invalid.
         // The Game Code should be removed from storage and the user should be redirected to the home page.
         // This has yet to be implemented.
@@ -319,7 +327,7 @@ export default function Game() {
     await axios.post(`http://${source}/turn-options`, {
         player_id: localStorage.getItem('player_id'),
         game_code: gameCode,
-      }).then((res) => {
+      }).then((res: any) => {
         console.log(res.data)
         
         if (!res.data) {
@@ -346,7 +354,7 @@ export default function Game() {
         })
         setActionDetails(actionDetails)
         setActionNames(actions);
-      }).catch((error) => {
+      }).catch((error: any) => {
         console.log("Error while fetching options:", error);
       });
 
