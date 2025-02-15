@@ -16,7 +16,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+import { get_turn_color, get_turn_message, Character } from "../utils";
+
 import Image from "next/image";
+import StatBar from "@/components/StatBar";
 
 
 export default function Game() {
@@ -47,7 +50,8 @@ export default function Game() {
   // the enemyCharacters state needs to be implemented
 
   // A list of all the Characters in the game, in JSONified Character format
-  const [characters, setCharacters] = useState<JSON[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [character, setCharacter] = useState<Character>();
   
   // A list of all the action's names that the player can perform
   const [actionNames, setActionNames] = useState<string[]>([]);
@@ -69,7 +73,11 @@ export default function Game() {
   const [gameMessages, setGameMessages] = useState<string[]>([]);
 
   // The target for the action. Unsure if this is preferred over a Dictionary matching param to value.
+
   const [target, setTarget] = useState("");
+  const [showTarget, setShowTarget] = useState<boolean>(false);
+
+  // Stores the WebSocket reference used to connect to the backend and for live updates
   const wsRef = useRef<WebSocket | null>(null);
 
   // This function controls the websocket. 
@@ -99,11 +107,13 @@ export default function Game() {
         console.log("WebSocket message:", event.data);
 
         // This means there is a game update. The game state is updated and the player's options are updated.
-        
-        updateGame(); // updateGame is slow and should not be relied on for real-time updates.
-        getOptions(); // This only succeeds if this player is the current player. However, to avoid
-        // edge cases, we get this regardless of whether the player is the current player or not.
+        setTimeout(() => {
+          updateGame(); // updateGame is slow and should not be relied on for real-time updates.
+          getOptions(); // This only succeeds if this player is the current player. However, to avoid
+        //                 edge cases, we get this regardless of whether the player is the current player or not.
+        }, 1000)
 
+        
         setEvent(event.data);
         /** 
          * Example format of event.data: (parsed)
@@ -154,10 +164,12 @@ export default function Game() {
           });
         }
 
-        if (parsed_data.type === "game_update" || parsed_data.type === "refresh") {
-          updateGame();
-          getOptions();
-        }
+        // if (parsed_data.type === "game_update" || parsed_data.type === "refresh") {
+        // setTimeout(() => {
+        //   updateGame();
+        //   getOptions();
+        // }, 1000)
+        // }
       }
 
 
@@ -219,11 +231,14 @@ export default function Game() {
       router.push("/");
     }
 
-    // This function updates the game state with the most recent data from the server.
-    updateGame();
+    // These functions should be ran after a delay to allow loading first
+    setTimeout(() => {
+      // This function updates the game state with the most recent data from the server.
+      updateGame();
 
-    // This function gets the options for the player to perform actions.
-    getOptions();
+      // This function gets the options for the player to perform actions.
+      getOptions();
+    }, 3000)
 
     // Connect to the websocket
     webSocketInit();
@@ -263,6 +278,7 @@ export default function Game() {
             index++;
         });
         
+        setCharacter(res.data.characters[thisIndex])
         
         setOpponent(opponents);
     }).catch((e: any) => {
@@ -361,8 +377,25 @@ export default function Game() {
     
   }
 
+  const updateAndSetAction = (action: string) => {
+    setAction(action);
+    actionDetails.map((a: Action) => {
+      if (a.name === actionNames[parseInt(action)]) {
+        console.log(a);
+        console.log(`Params: ${a.params}`)
+        if (a.params.includes("Target")) {
+          setShowTarget(true);
+        } else {
+          setShowTarget(false);
+        }
+      }
+    })
+  }
+
   const doPlayerAction = async (e: any) => {
     e.preventDefault();
+
+    console.log("Preparing to update game due to response...")
     
     if (!wsRef.current) {
       console.error("WebSocket connection not established");
@@ -386,6 +419,9 @@ export default function Game() {
       }
     } catch (error) {
       console.error("WebSocket send error:", error);
+    } finally {
+      updateGame();
+      getOptions();
     }
   };
 
@@ -431,7 +467,7 @@ export default function Game() {
                 <div className="flex flex-col space-y-1.5">
                   You are {playerID}
                   <Label htmlFor="framework">Action</Label>
-                  <Select onValueChange={setAction}>
+                  <Select onValueChange={updateAndSetAction}>
                     <SelectTrigger id="framework">
                       <SelectValue placeholder="No Action Selected" />
                     </SelectTrigger>
@@ -446,32 +482,24 @@ export default function Game() {
                     </SelectContent>
                   </Select>
 
-                  {actionDetails.map((a: Action, i) => {
-                    if (a.name === actionNames[parseInt(action)]) {
-                      console.log(a);
-                      if (a.params.includes("Target")) {
-                      return (
-                        <div key={a.name}>
-                          <Label htmlFor="target">Target</Label>
-                          <Select onValueChange={setTarget}>
-                            <SelectTrigger id="target">
-                              <SelectValue placeholder="No Target Selected" />
-                            </SelectTrigger>
-                            <SelectContent position="popper">
-                              {playerIDs.map((p: string) => {
-                                if (p !== playerID) {
-                                  return (
-                                    <SelectItem value={p} key={p}>{p}</SelectItem>
-                                  )
-                                }
-                              })}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )
-                      }
-                    }
-                  })}
+                  {showTarget ? <div>
+                      <Label htmlFor="target">Target</Label>
+                      <Select onValueChange={setTarget}>
+                        <SelectTrigger id="target">
+                          <SelectValue placeholder="No Target Selected" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          {playerIDs.map((p: string) => {
+                            if (p !== playerID) {
+                              return (
+                                <SelectItem value={p} key={p}>{p}</SelectItem>
+                              )
+                            }
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  : ""}
                 </div>
                 </form></CardContent> :
             <CardContent>
@@ -479,62 +507,151 @@ export default function Game() {
             </CardContent>
             }
             <CardFooter className="flex justify-between">
+              <div className="flex-col gap-4">
                 <Button onClick={doPlayerAction}>Confirm Action</Button><br/>
-                Current Turn: {turnCount}<br></br>
+                <Button onClick={() => {updateGame(); getOptions();}}>Force Refresh</Button><br/>
+              </div>
+                Current Turn: {turnCount}<br/>
                 Your Turn Index: {thisIndex}
             </CardFooter>
+            <CardFooter className="justify-items-center">
+            {showTarget ? characters.map((c: any, i: number) => {
+              if (target === c.character_data.owner) {
+                return (
+                  <Card key={i} className={`flex-none w-64 border-blue-500 w-72`}>
+                    <CardHeader>
+                      <CardTitle>Targeted: {c.name}</CardTitle>
+                      <CardDescription>Owned By {c.character_data.owner}</CardDescription>
+                      <CardTitle>{c.base_stats.health}/{c.base_stats.max_health} HP</CardTitle>
+                      <StatBar value={c.base_stats.health} max_value={c.base_stats.max_health} color="d61f1f"></StatBar>
+                    </CardHeader>
+                    <CardContent>
+                      <Image alt={""} height={200} width={200} src={`/character_portraits/${c.name.replace(" ", "")}.png`}></Image>
+                    </CardContent>
+                    <CardFooter>
+                      <div className="flex flex-col">
+                        <h2><b>Character Details:</b></h2>
+                        <div className="grid grid-cols-1">
+                          <p><b>Status Effects:</b></p>
+                          {c.activeEffects.keys().length > 0 ? c.activeEffects.map((ae: any) => {return (<p key={ae.name}>{ae.name}</p>)}) : <p>No Active Effects Applied</p>}
+                  
+                        </div>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                )
+              }
+          }) : ""}
+          </CardFooter>
             
             
           </Card>
+
           <div className="lg:w-3/5 lg:max-w-[600px] p-4">
             <div className="flex gap-4">
+              
               {characters.map((c: any, i: number) => {
+                const char_turn = playerIDs.indexOf(c.character_data.owner);
+                const turns_until = -(turnCount - char_turn);
                 console.log(`Character: ${c.name}`);
                 if (playerIDs[i] === playerID) {
                   return (
-                    <Card key={i} className="flex-none w-96">
+                    <Card key={i} className={`flex-none w-96 ${get_turn_color(turns_until)}`}>
                       <CardHeader>
                         <CardTitle>{c.name} - {playerIDs[i] === playerID ? "You" : playerIDs[i]}</CardTitle>
                         <CardDescription>{c.base_stats.health}/{c.base_stats.max_health} HP</CardDescription>
-                        
+                        <CardDescription>{get_turn_message(turns_until)}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <Image alt={""} height={300} width={300} src={`/character_portraits/${c.name.replace(" ", "")}.png`}></Image>
                       </CardContent>
                       <CardFooter>
                         <div className="flex flex-col">
-                        <h2><b>Your Stats:</b></h2>
-                        <div className="grid grid-cols-2">
-                        <p>SP: {c.base_stats.skill_points}/{c.base_stats.max_skill_points}</p>
-                        <p>MP: {c.base_stats.mp}/{c.base_stats.max_mp}</p>
-                        <p>ATK: {c.base_stats.attack_damage}</p>
-                        <p>SPELL: {c.base_stats.spell_damage}</p>
-                        <p>DEF: {c.base_stats.defense}</p>
-                        <p>MAG DEF: {c.base_stats.magic_defense}</p>
-                        <p>CRIT: {c.base_stats.critical_chance * 100}%</p>
-                        <p>ACC: {c.base_stats.accuracy}</p>
-                        <p>AGIL: {c.base_stats.agility}</p></div></div>
+                          <h2><b>Your Stats:</b></h2>
+                          <div className="grid grid-cols-2">
+                            <p>SP: {c.base_stats.skill_points}/{c.base_stats.max_skill_points}</p>
+                            <p>MP: {c.base_stats.mp}/{c.base_stats.max_mp}</p>
+                            <p>ATK: {c.base_stats.attack_damage}</p>
+                            <p>SPELL: {c.base_stats.spell_damage}</p>
+                            <p>DEF: {c.base_stats.defense}</p>
+                            <p>MAG DEF: {c.base_stats.magic_defense}</p>
+                            <p>CRIT: {c.base_stats.critical_chance * 100}%</p>
+                            <p>ACC: {c.base_stats.accuracy}</p>
+                            <p>AGIL: {c.base_stats.agility}</p>
+                          </div>
+                        </div>
                       </CardFooter>
                     </Card>
                   )
                 } 
               })}
               <div className="grid grid-cols-1 gap-4">
-              {characters.map((c: any, i: number) => {
+              <h2 className="text-center"><b>Upcoming Players</b></h2>
+              {characters.sort((a: Character, b: Character) => {
+                // Not ideal, but to save time
+                // @ts-ignore
+                const char_turn_a = a.character_data.owner;
+                const turns_until_a = -(turnCount - char_turn_a);
+                // @ts-ignore
+                const turns_until_b = -(turnCount - b.character_data.owner)
+                return turns_until_a - turns_until_b;
+              }).map((c: any, i: number) => {
+                const char_turn = playerIDs.indexOf(c.character_data.owner);
+                const turns_until = -(turnCount - char_turn);
+                const this_char = character || {team: ""}
+                const char_team = this_char.team === c.team ? "Ally" : "Enemy"
                 if (!(playerIDs[i] === playerID)) {
                   return (
-                    <Card key={i} className="flex-none w-64">
+                    <Card key={i} className={`flex-none w-64 ${get_turn_color(turns_until)}`}>
                       <CardHeader>
-                        <CardTitle>{c.name} - {playerIDs[i] === playerID ? "You" : playerIDs[i]}</CardTitle>
-                        <CardDescription>{c.base_stats.health}/{c.base_stats.max_health} HP</CardDescription>
-                        
+                        <CardTitle>{c.name} - {get_turn_message(turns_until)}</CardTitle>
+                        <CardDescription>Owned By {playerIDs[i] === playerID ? "You" : `${playerIDs[i]} [${char_team}]`}</CardDescription>
+                        <CardTitle>{c.base_stats.health}/{c.base_stats.max_health} HP</CardTitle>
+                        <StatBar value={c.base_stats.health} max_value={c.base_stats.max_health} color="d61f1f"></StatBar>
                       </CardHeader>
                       <CardContent>
                         <Image alt={""} height={200} width={200} src={`/character_portraits/${c.name.replace(" ", "")}.png`}></Image>
                       </CardContent>
                       <CardFooter>
-                        <p>SP: {c.base_stats.skill_points}</p><br/>
-                        <p>MP: {c.base_stats.mp}</p>
+                        <div className="flex flex-col">
+                          <h2><b>Character Details:</b></h2>
+                          <div className="grid grid-cols-1">
+                            <p><b>Status Effects:</b></p>
+                            {c.activeEffects.keys().length > 0 ? c.activeEffects.map((ae: any) => {return (<p key={ae.name}>{ae.name}</p>)}) : <p>No Active Effects Applied</p>}
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button>More Details</Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  More Details: {`${c.name} [${playerIDs[i]} - ${char_team}]`} 
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                {get_turn_message(turns_until)}
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                  <div>
+                                  <p><b>Status Effects:</b></p>
+                                  {c.activeEffects.keys().length > 0 ? c.activeEffects.map((ae: any) => {return (<p key={ae.name}>{ae.name}</p>)}) : <p>No Active Effects Applied</p>}
+                                  <br/>
+                                  <p><b>Applied Effects:</b></p>
+                                  {c.effects.keys().length > 0 ? c.effects.map((e: any) => {
+                                    const stat_display = `${e.stat.charAt(0).toUpperCase() + String(e.stat).slice(1)} ${e.modifier_type === "add" ? "+" : "x"}${e.modifier_type === "multiply_base" ? String((e.value + 1)) : e.value}`;
+                                    <p><b>{e.displayName}</b>: {stat_display}[{e.duration >= 9999 ? "Infinite" : e.duration} turns left]</p>
+                                  }) : <p>No Applied Effects</p>}<br/>
+                                  <p><b>Turn-Based Active Modifiers</b></p>
+                                  <p>These modifiers apply at the end of each turn. When the Modifier expires, the stat is not restored.</p>
+                                  {c.active_modifiers.keys().length > 0 ? c.effects.map((e: any) => {
+                                    const stat_display: string = `${e.stat.charAt(0).toUpperCase() + String(e.stat).slice(1)} ${e.modifier_type === "add" ? "+" : "x"}${e.modifier_type === "multiply_base" ? String((e.value + 1)) : e.value}`;
+                                    <p><b>{e.displayName}</b>: {stat_display}[]</p>
+                                  }) : <p>No Active Modifiers Applied</p>}
+                                  </div>
+                                <AlertDialogAction>Close</AlertDialogAction>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
                       </CardFooter>
                     </Card>
                   )

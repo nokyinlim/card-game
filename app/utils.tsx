@@ -68,7 +68,7 @@ export type Character = {
     team: string;
     element: string;
     base_stats: BaseStats;
-    character_data: object;
+    character_data: JSON;
     stat_modifiers: StatModifier[];
     active_modifiers: StatModifier[];
     activeEffects: StatModifier[];
@@ -81,8 +81,29 @@ export type Character = {
     description: string;
 }
 
-export const character_portraits = {
-    "Armored Sentinel": require("public/character_portraits/Guardian.png"),
-    "Electric-Mage": require("public/character_portraits/Electric-Mage.png"),
-    "Sorcerer": require("public/character_portraits/Sorcerer.png"),
+export function get_turn_color(turns_until: number): string {
+    if (turns_until === 0) {
+        return "border-lime-400";
+    } else if (turns_until === 1) {
+        return "border-yellow-400";
+    } else if (turns_until === 2) {
+        return "border-red-400";
+    } else {
+        return "";
+    }
+}
+
+export function get_turn_message(turns_until: number): string {
+    if (turns_until === 0) {
+        return "Active Player"
+    } else if (turns_until === 1) {
+        return "Next Player"
+    }
+    return `Next Turn in ${turns_until} turns`
+}
+
+export function get_portrait_src(char_name: string) {
+
+
+    let portrait_src: string = `/character_portraits/${char_name.replace(" ", "")}.png`;
 }
