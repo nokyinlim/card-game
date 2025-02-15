@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+import Image from "next/image";
+
 
 export default function Game() {
   // Set up constants
@@ -35,12 +37,12 @@ export default function Game() {
   const [thisIndex, setThisIndex] = useState<number>(0);
 
   // A list of the opponent player IDs (not in the player's team)
-  const [opponent, setOpponent] = useState<string[]>([""]);
+  const [opponent, setOpponent] = useState<string[]>([]);
 
   // the enemyCharacters state needs to be implemented
 
   // A list of all the Characters in the game, in JSONified Character format
-  const [characters, setCharacters] = useState([]);
+  const [characters, setCharacters] = useState<JSON[]>([]);
   
   // A list of all the action's names that the player can perform
   const [actionNames, setActionNames] = useState<string[]>([]);
@@ -80,8 +82,10 @@ export default function Game() {
       // A message is received from the WebSocket. This message is then set to the event state.
       const parsed_data = JSON.parse(event.data);
 
-      if (parsed_data.game_code != gameCode) {
-        console.log(`This WebSocket is not for this current game. WS Returned Code: ${parsed_data.game_code}; Current Code: ${gameCode}`);
+      const this_game_code = gameCode;
+
+      if (parsed_data.game_code != this_game_code && false) {
+        console.log(`This WebSocket is not for this current game. WS Returned Code: ${parsed_data.game_code}; Current Code: ${this_game_code}`);
       } else {
 
         console.log("WebSocket message:", event.data);
@@ -182,7 +186,7 @@ export default function Game() {
   useEffect(() => {
 
     // Gets the game code from local storage and sets it to the game code state.
-    setGameCode(localStorage.getItem("game_code") || "");
+    
     
     // This is a check to see if the game code is empty. If it is, the user is redirected to the home page. 
     // Unsure if the user should be prompted to enter a game code to rejoin or not.
@@ -190,6 +194,12 @@ export default function Game() {
       console.log("Could not find a Game Code. Redirecting to Home Page.");
       router.push("/");
     }
+
+    const temp_game_code: string = localStorage.getItem("game_code") || "";
+    if (temp_game_code === "") {
+      console.log("The Game Code was null!")
+    }
+    setGameCode(temp_game_code);
 
     // Gets the player ID from local storage and sets it to the player ID state.
     setPlayerID(localStorage.getItem("player_id") || "p2");
@@ -218,8 +228,10 @@ export default function Game() {
     axios.post(`http://${source}/game-data`, {
         game_code: gameCode
     }).then((res) => {
+        // Debug Purposes Only
+        console.log(gameCode);
         // This sets the turn count to the current turn count from the server.
-        setTurnCount(res.data.current_turn[0])
+        setTurnCount(res.data.current_turn[0]);
 
         // While this is stored in local storage, there is a server-side check to ensure that this player is indeed the correct player.
         // This is to prevent cheating.
@@ -241,7 +253,7 @@ export default function Game() {
               opponents.push(p);
             }
             index++;
-        })
+        });
         
         
         setOpponent(opponents);
@@ -281,7 +293,26 @@ export default function Game() {
     return toastItem;
   }
 
+  // test Toasting function
 
+  const testToast = () => {
+    toast({
+      variant: "default",
+      title: "Critical Hit!",
+      description: "You attacked Electric-Mage for 25 damage!",
+      duration: 5000,
+    });
+    toast({
+      variant: "default",
+      description: "Electric-Mage [Alice Smith] casted Electrostatic Charge on Armored Sentinel [Bob Smith] for 37.5 damage!",
+      duration: 5000,
+    });
+    toast({
+      variant: "destructive",
+      description: "Armored Sentinel [Bob Smith] used Shield Bash on Ninja [You] for 27.5 earth damage!",
+      duration: 5000
+    });
+  }
 
   const getOptions = async () => {
     const source = localStorage.getItem("source") || "localhost:8000";
@@ -390,6 +421,7 @@ export default function Game() {
             {turnCount === thisIndex ? 
             <CardContent><form>
                 <div className="flex flex-col space-y-1.5">
+                  You are {playerID}
                   <Label htmlFor="framework">Action</Label>
                   <Select onValueChange={setAction}>
                     <SelectTrigger id="framework">
@@ -435,7 +467,7 @@ export default function Game() {
                 </div>
                 </form></CardContent> :
             <CardContent>
-                
+                You are {playerID}<br/>It is currently not your turn! Please Wait.
             </CardContent>
             }
             <CardFooter className="flex justify-between">
@@ -445,8 +477,65 @@ export default function Game() {
             </CardFooter>
             
             
-            </Card>
+          </Card>
           <div className="lg:w-3/5 lg:max-w-[600px] p-4">
+            <div className="flex gap-4">
+              {characters.map((c: any, i: number) => {
+                console.log(`Character: ${c.name}`);
+                if (playerIDs[i] === playerID) {
+                  return (
+                    <Card key={i} className="flex-none w-96">
+                      <CardHeader>
+                        <CardTitle>{c.name} - {playerIDs[i] === playerID ? "You" : playerIDs[i]}</CardTitle>
+                        <CardDescription>{c.base_stats.health}/{c.base_stats.max_health} HP</CardDescription>
+                        
+                      </CardHeader>
+                      <CardContent>
+                        <Image alt={""} height={300} width={300} src={`/character_portraits/${c.name.replace(" ", "")}.png`}></Image>
+                      </CardContent>
+                      <CardFooter>
+                        <div className="flex flex-col">
+                        <h2><b>Your Stats:</b></h2>
+                        <div className="grid grid-cols-2">
+                        <p>SP: {c.base_stats.skill_points}/{c.base_stats.max_skill_points}</p>
+                        <p>MP: {c.base_stats.mp}/{c.base_stats.max_mp}</p>
+                        <p>ATK: {c.base_stats.attack_damage}</p>
+                        <p>SPELL: {c.base_stats.spell_damage}</p>
+                        <p>DEF: {c.base_stats.defense}</p>
+                        <p>MAG DEF: {c.base_stats.magic_defense}</p>
+                        <p>CRIT: {c.base_stats.critical_chance * 100}%</p>
+                        <p>ACC: {c.base_stats.accuracy}</p>
+                        <p>AGIL: {c.base_stats.agility}</p></div></div>
+                      </CardFooter>
+                    </Card>
+                  )
+                } 
+              })}
+              <div className="grid grid-cols-1 gap-4">
+              {characters.map((c: any, i: number) => {
+                if (!(playerIDs[i] === playerID)) {
+                  return (
+                    <Card key={i} className="flex-none w-64">
+                      <CardHeader>
+                        <CardTitle>{c.name} - {playerIDs[i] === playerID ? "You" : playerIDs[i]}</CardTitle>
+                        <CardDescription>{c.base_stats.health}/{c.base_stats.max_health} HP</CardDescription>
+                        
+                      </CardHeader>
+                      <CardContent>
+                        <Image alt={""} height={200} width={200} src={`/character_portraits/${c.name.replace(" ", "")}.png`}></Image>
+                      </CardContent>
+                      <CardFooter>
+                        <p>SP: {c.base_stats.skill_points}</p><br/>
+                        <p>MP: {c.base_stats.mp}</p>
+                      </CardFooter>
+                    </Card>
+                  )
+                }
+                })}
+                </div>
+            </div>
+
+
             <h2 className="text-xl font-bold mb-4">Debug</h2>
             <div className="mb-4">
               {gameMessages.map((m: string, i: number) => {
@@ -464,9 +553,10 @@ export default function Game() {
               <p>Opponent IDs: {opponent.join(", ")}</p>
               <p>Action Names: {actionNames.join(", ")}</p>
               <p>Target: {target}</p>
-              <p>Characters: {JSON.stringify(characters)}</p>
+              <p>Characters: {JSON.stringify(characters.map((c: any) => {return c.name}))}</p>
               <p>Action Details: {JSON.stringify(actionDetails)}</p>
             </div>
+            <Button onClick={testToast}>Test Toast</Button>
             <Button onClick={() => {
               updateGame();
               getOptions();
