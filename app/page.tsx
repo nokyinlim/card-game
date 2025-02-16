@@ -5,26 +5,15 @@ import { Label } from "@radix-ui/react-label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRouter as useNextRouter } from "next/router";
 import { Dialog, DialogTrigger, DialogTitle, DialogContent, DialogDescription, DialogHeader } from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { DialogClose } from "@radix-ui/react-dialog";
 export default function Home() {
-
-  const nextRouter = useNextRouter();
   const [source, setSource] = useState("localhost:8000");
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const { query } = nextRouter;
-      const textValue = query.source || "localhost:8000";
-      setSource(localStorage.getItem("source") || textValue as string);
-    }
-  }, [nextRouter]);
 
   const { toast } = useToast();
   const router = useRouter();
