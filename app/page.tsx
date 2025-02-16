@@ -1,12 +1,11 @@
-"use client"
-import { useLocation } from 'react-router-dom';
-
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@radix-ui/react-label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useRouter as useNextRouter } from "next/router";
 import { Dialog, DialogTrigger, DialogTitle, DialogContent, DialogDescription, DialogHeader } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -16,18 +15,18 @@ import { Input } from "@/components/ui/input";
 import { DialogClose } from "@radix-ui/react-dialog";
 export default function Home() {
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const textValue = params.get('source') || "localhost:8000";
+  const nextRouter = useNextRouter();
+  const { query } = nextRouter;
+  const textValue = query.source || "localhost:8000";
 
   const { toast } = useToast();
   const router = useRouter();
-
   const [source, setSource] = useState("localhost:8000");
 
   useEffect(() => {
-    setSource(localStorage.getItem("source") || textValue);
-  })
+    setSource(localStorage.getItem("source") || textValue as string);
+  }, [textValue]);
+  
 
   const openLink = (url: string) => {
     toast({
