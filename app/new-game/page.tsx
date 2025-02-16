@@ -28,7 +28,9 @@ export default function NewGame() {
   const [didCopyGameCode, setDidCopyGameCode] = useState(false);
   const [username, setUsername] = useState("");
   
-  const source = localStorage.getItem("source") || "localhost:8000";
+  const [source, setSource] = useState<string>("localhost:8000");
+
+
 
   const router = useRouter();
 
@@ -39,6 +41,8 @@ export default function NewGame() {
     }).catch((e) => {
         console.log(`Error: ${e}`);
     });
+
+    setSource(localStorage.getItem("source") || "localhost:8000")
 
     setUsername(localStorage.getItem("username") ?? "");
   }, [])

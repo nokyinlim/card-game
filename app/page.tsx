@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger, DialogTitle, DialogContent, DialogDescription, DialogHeader } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { DialogClose } from "@radix-ui/react-dialog";
@@ -17,7 +17,11 @@ export default function Home() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const [source, setSource] = useState(localStorage.getItem("source") || "localhost:8000");
+  const [source, setSource] = useState("localhost:8000");
+
+  useEffect(() => {
+    setSource(localStorage.getItem("source") || "localhost:8000");
+  })
 
   const openLink = (url: string) => {
     toast({

@@ -20,7 +20,7 @@ export default function JoinGame() {
 
   const { toast } = useToast();
 
-  const source = localStorage.getItem("source") || "localhost:8000";
+  const [source, setSource] = useState<string>("localhost:8000");
 
   useEffect(() => {
     axios.get(`http://${source}/get-all-characters`).then((res) => {
@@ -29,6 +29,8 @@ export default function JoinGame() {
     }).catch((e) => {
         console.log(`Error while fetching characters: ${e}`);
     });
+
+    setSource(localStorage.getItem("source") || "localhost:8000")
 
     toast({
       title: "You don't have a Game Key",

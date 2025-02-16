@@ -49,7 +49,11 @@ export default function Login() {
         },
     })
 
-    const source = localStorage.getItem("source") || "localhost:8000";
+    const [source, setSource] = useState<string>("localhost:8000");
+
+    useEffect(() => {
+        setSource(localStorage.getItem("source") || "localhost:8000")
+    }, [])
 
     const showToast = () => {
         toast({

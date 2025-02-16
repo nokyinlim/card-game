@@ -13,7 +13,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { use, useState } from "react"
+import { use, useEffect, useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 
@@ -43,7 +43,11 @@ export default function SignUpPage() {
     const crypto = require('crypto');
     const router = useRouter();
 
-    const source = localStorage.getItem("source") || "localhost:8000";
+    const [source, setSource] = useState<string>("localhost:8000");
+
+    useEffect(() => {
+        setSource(localStorage.getItem("source") || "localhost:8000")
+    }, [])
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
