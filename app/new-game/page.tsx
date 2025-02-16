@@ -127,7 +127,7 @@ export default function NewGame() {
               game_code: generatedGameCode
             })
             setTimeout(() => {router.push('/game')}, 1000)
-          }}>Start Game</Button>
+          }}>Activate Game</Button>
         </CardFooter>
         
       </Card>

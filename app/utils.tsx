@@ -95,11 +95,11 @@ export function get_turn_color(turns_until: number): string {
 
 export function get_turn_message(turns_until: number): string {
     if (turns_until === 0) {
-        return "Active Player"
+        return "Active"
     } else if (turns_until === 1) {
-        return "Next Player"
+        return "Next"
     }
-    return `Next Turn in ${turns_until} turns`
+    return `In ${turns_until} turns`
 }
 
 export function get_portrait_src(char_name: string) {

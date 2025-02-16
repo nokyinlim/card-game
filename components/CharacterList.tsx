@@ -219,7 +219,7 @@ const TutorialSteps: TutorialStep[] = [
           <span className="text-sm text-muted-foreground">Summons a weaker clone to fight for you until death or for 4 turns, whichever is longer. </span>
           <br/><h3 className="font-semibold text-sm">Passive: Way of the Ninja</h3>
           <p className="text-sm text-muted-foreground">
-            Increases critical hit chance against enemies with a status effect.
+            Increases attack damage against enemies with a status effect.
           </p><br/> 
           <h3 className="font-semibold text-sm">Ability: Precision Strike (4)</h3>
           <p className="text-sm text-muted-foreground">
